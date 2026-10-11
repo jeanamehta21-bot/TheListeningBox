@@ -21,3 +21,5 @@ MIN_FREE_GB = 2.0
 
 HOST = "0.0.0.0"
 PORT = 5000
+
+AUDIO_DEVICE = "plughw:2,0" 
