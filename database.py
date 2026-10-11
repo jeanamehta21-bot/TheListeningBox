@@ -1,12 +1,16 @@
+
 import sqlite3
 from datetime import datetime
+
 from config import DATA_DIR, DATABASE_PATH
+
 
 def get_connection():
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(DATABASE_PATH)
     connection.row_factory = sqlite3.Row
     return connection
+
 
 def initialize_database():
     with get_connection() as conn:
@@ -19,6 +23,7 @@ def initialize_database():
             size_bytes INTEGER,
             cpu_temperature_c REAL
         );
+
         CREATE TABLE IF NOT EXISTS detections (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             recording_id INTEGER NOT NULL,
@@ -31,55 +36,100 @@ def initialize_database():
         );
         """)
 
+        # Migrate existing databases without removing old data.
+        existing = {
+            row["name"]
+            for row in conn.execute("PRAGMA table_info(recordings)")
+        }
+
+        new_columns = {
+            "audio_rms": "REAL",
+            "audio_peak": "INTEGER",
+            "sound_level": "TEXT",
+        }
+
+        for name, column_type in new_columns.items():
+            if name not in existing:
+                conn.execute(
+                    f"ALTER TABLE recordings ADD COLUMN {name} {column_type}"
+                )
+
+
 def save_recording(file_path, processed_info, environment):
     with get_connection() as conn:
         cur = conn.execute(
-            """INSERT INTO recordings
-            (file_path, started_at, duration_seconds, size_bytes, cpu_temperature_c)
-            VALUES (?, ?, ?, ?, ?)""",
+            """
+            INSERT INTO recordings (
+                file_path, started_at, duration_seconds, size_bytes,
+                cpu_temperature_c, audio_rms, audio_peak, sound_level
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
             (
                 str(file_path),
                 environment["timestamp"],
                 processed_info["duration_seconds"],
                 processed_info["size_bytes"],
-                environment["cpu_temperature_c"],
+                environment.get("cpu_temperature_c"),
+                environment.get("audio_rms"),
+                environment.get("audio_peak"),
+                environment.get("sound_level", "unknown"),
             ),
         )
         return cur.lastrowid
 
-def save_detection(recording_id, species, confidence,
-                   start_seconds=None, end_seconds=None):
+
+def save_detection(
+    recording_id, species, confidence,
+    start_seconds=None, end_seconds=None
+):
     with get_connection() as conn:
         conn.execute(
-            """INSERT INTO detections
-            (recording_id, species, confidence, start_seconds,
-             end_seconds, created_at)
-            VALUES (?, ?, ?, ?, ?, ?)""",
-            (
+            """
+            INSERT INTO detections (
                 recording_id, species, confidence,
-                start_seconds, end_seconds,
+                start_seconds, end_seconds, created_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (
+                recording_id,
+                species,
+                confidence,
+                start_seconds,
+                end_seconds,
                 datetime.now().isoformat(timespec="seconds"),
             ),
         )
 
+
 def recent_detections(limit=50):
     with get_connection() as conn:
         rows = conn.execute(
-            """SELECT detections.*, recordings.file_path
+            """
+            SELECT detections.*, recordings.file_path
             FROM detections
             JOIN recordings ON detections.recording_id = recordings.id
-            ORDER BY detections.created_at DESC LIMIT ?""",
+            ORDER BY detections.created_at DESC
+            LIMIT ?
+            """,
             (limit,),
         ).fetchall()
         return [dict(row) for row in rows]
 
+
 def recent_recordings(limit=20):
     with get_connection() as conn:
         rows = conn.execute(
-            "SELECT * FROM recordings ORDER BY started_at DESC LIMIT ?",
+            """
+            SELECT * FROM recordings
+            ORDER BY started_at DESC
+            LIMIT ?
+            """,
             (limit,),
         ).fetchall()
         return [dict(row) for row in rows]
+
 
 if __name__ == "__main__":
     initialize_database()
