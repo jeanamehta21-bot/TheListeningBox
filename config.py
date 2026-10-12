@@ -28,13 +28,20 @@ LONGITUDE = None
 # Storage
 MIN_FREE_GB = 1.0
 
+
 # BirdNET
-BIRDNET_ENABLED = True
+BIRDNET_ENABLED = os.getenv(
+    "LISTENING_BOX_BIRDNET", "1"
+).strip().lower() in ("1", "true", "yes", "on")
+
 BIRDNET_MIN_CONFIDENCE = 0.50
 BIRDNET_LOCATION_FILTER = False
 
 # Environmental sound classification
-YAMNET_ENABLED = True
+YAMNET_ENABLED = os.getenv(
+    "LISTENING_BOX_YAMNET", "1"
+).strip().lower() in ("1", "true", "yes", "on")
+
 YAMNET_MIN_CONFIDENCE = 0.25
 
 YAMNET_MODEL_URL = (
