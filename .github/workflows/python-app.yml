@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 jobs:
-  syntax-check:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,3 +25,6 @@ jobs:
 
       - name: Check Python syntax
         run: python -m compileall -q .
+
+      - name: Run hardware-free tests
+        run: python -m unittest discover -s tests -v
