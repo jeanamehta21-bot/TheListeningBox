@@ -1,40 +1,98 @@
+
 import subprocess
 from datetime import datetime
+from pathlib import Path
+
 from config import (
-    AUDIO_DEVICE, CHANNELS, MIN_FREE_GB, RECORDINGS_DIR,
-    RECORD_SECONDS, SAMPLE_RATE,
+    AUDIO_DEVICE,
+    CHANNELS,
+    MIN_FREE_GB,
+    RECORDINGS_DIR,
+    RECORD_SECONDS,
+    SAMPLE_RATE,
 )
 from utils import free_space_gb
 
 
 def find_arecord_devices():
-    result = subprocess.run(["arecord", "-l"], capture_output=True, text=True)
+    """Return the audio devices reported by ALSA."""
+    try:
+        result = subprocess.run(
+            ["arecord", "-l"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except FileNotFoundError as exc:
+        raise RuntimeError(
+            "arecord was not found. Install alsa-utils first."
+        ) from exc
+
     return result.stdout + result.stderr
 
 
 def record_audio():
-    if free_space_gb(RECORDINGS_DIR) < MIN_FREE_GB:
-        raise RuntimeError(f"Less than {MIN_FREE_GB} GB free.")
+    """Record one WAV file and return its path."""
+    if RECORD_SECONDS <= 0:
+        raise ValueError("RECORD_SECONDS must be greater than zero.")
+
+    if SAMPLE_RATE <= 0 or CHANNELS <= 0:
+        raise ValueError("Audio sample rate and channels must be positive.")
+
+    RECORDINGS_DIR.mkdir(parents=True, exist_ok=True)
+
+    available_gb = free_space_gb(RECORDINGS_DIR)
+    if available_gb < MIN_FREE_GB:
+        raise RuntimeError(
+            f"Only {available_gb:.2f} GB is free; "
+            f"at least {MIN_FREE_GB:.2f} GB is required."
+        )
 
     now = datetime.now()
     folder = RECORDINGS_DIR / now.strftime("%Y-%m-%d")
     folder.mkdir(parents=True, exist_ok=True)
-    filename = folder / f"{now.strftime('%H-%M-%S')}.wav"
+
+    timestamp = now.strftime("%H-%M-%S-%f")
+    filename = folder / f"{timestamp}.wav"
 
     command = [
-        "arecord", "-D", AUDIO_DEVICE,
-        "-t", "wav", "-f", "S16_LE",
-        "-r", str(SAMPLE_RATE), "-c", str(CHANNELS),
-        "-d", str(RECORD_SECONDS), str(filename),
+        "arecord",
+        "-D", AUDIO_DEVICE,
+        "-t", "wav",
+        "-f", "S16_LE",
+        "-r", str(SAMPLE_RATE),
+        "-c", str(CHANNELS),
+        "-d", str(RECORD_SECONDS),
+        str(filename),
     ]
-    result = subprocess.run(command, capture_output=True, text=True)
-    if result.returncode != 0:
-        raise RuntimeError(
-            f"arecord failed using {AUDIO_DEVICE!r}:\n{result.stderr}\n"
-            "Check `arecord -l` and update AUDIO_DEVICE in config.py."
+
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=False,
         )
-    if not filename.exists() or filename.stat().st_size < 1000:
-        raise RuntimeError("Recording file was not created correctly.")
+    except FileNotFoundError as exc:
+        raise RuntimeError(
+            "arecord was not found. Install alsa-utils first."
+        ) from exc
+
+    if result.returncode != 0:
+        filename.unlink(missing_ok=True)
+        raise RuntimeError(
+            f"Recording failed using audio device {AUDIO_DEVICE!r}.\n"
+            f"{result.stderr.strip()}\n"
+            "Check the microphone with `arecord -l` and configure "
+            "LISTENING_BOX_AUDIO_DEVICE or AUDIO_DEVICE."
+        )
+
+    if not filename.is_file() or filename.stat().st_size < 1000:
+        filename.unlink(missing_ok=True)
+        raise RuntimeError(
+            "The recording is missing or too small to be valid."
+        )
+
     return filename
 
 
