@@ -1,9 +1,5 @@
-"""Optional YAMNet environmental classifier.
 
-Install its dependencies separately. TensorFlow may be too heavy for a
-Raspberry Pi 3, so develop and test on a computer first.
-This adapter accepts 16-bit PCM WAV audio.
-"""
+"""Optional YAMNet general environmental sound classifier."""
 
 import csv
 import logging
@@ -25,6 +21,7 @@ class YAMNetBackend:
         self.available = False
         self.model = None
         self.class_names = []
+        self.tf = None
 
         if not YAMNET_ENABLED:
             logger.info("YAMNet disabled by configuration.")
@@ -42,56 +39,75 @@ class YAMNetBackend:
             )
 
             with open(
-                class_map_path, newline="", encoding="utf-8"
+                class_map_path,
+                newline="",
+                encoding="utf-8",
             ) as handle:
                 self.class_names = [
                     row["display_name"]
                     for row in csv.DictReader(handle)
                 ]
 
+            if not self.class_names:
+                raise RuntimeError("YAMNet returned an empty class map.")
+
             self.available = True
             logger.info("YAMNet model loaded.")
 
         except Exception:
             logger.exception(
-                "YAMNet unavailable; recording can continue."
+                "YAMNet could not load; continuing without YAMNet."
             )
+            self.available = False
+            self.model = None
 
     @staticmethod
     def _read_mono_16k(audio_file):
+        """Read 16-bit PCM WAV and convert it to mono 16 kHz audio."""
         import numpy as np
 
         with wave.open(str(Path(audio_file)), "rb") as wav:
             channels = wav.getnchannels()
             width = wav.getsampwidth()
             rate = wav.getframerate()
-            raw = wav.readframes(wav.getnframes())
+            frame_count = wav.getnframes()
+            raw = wav.readframes(frame_count)
+
+        if channels < 1:
+            raise ValueError("Audio file has an invalid channel count.")
 
         if width != 2:
-            raise ValueError("YAMNet input must be 16-bit PCM WAV.")
+            raise ValueError("YAMNet requires 16-bit PCM WAV audio.")
+
+        if rate not in (16000, 48000):
+            raise ValueError(
+                f"Unsupported sample rate {rate}; use 16000 or 48000 Hz."
+            )
 
         samples = (
-            np.frombuffer(raw, dtype="<i2").astype(np.float32)
-            / 32768.0
+            np.frombuffer(raw, dtype="<i2").astype(np.float32) / 32768.0
         )
 
-        # Convert stereo to mono before resampling.
+        if samples.size == 0:
+            raise ValueError("Audio file contains no samples.")
+
+        if samples.size % channels != 0:
+            raise ValueError("Audio data is incomplete for its channel count.")
+
         if channels > 1:
             samples = samples.reshape(-1, channels).mean(axis=1)
 
         if rate == 48000:
-            # Proper filtered conversion from 48 kHz to 16 kHz.
             from scipy.signal import resample_poly
 
             samples = resample_poly(
-                samples, up=1, down=3
+                samples,
+                up=1,
+                down=3,
             ).astype(np.float32)
 
-        elif rate != 16000:
-            raise ValueError(
-                f"Unsupported sample rate {rate}; "
-                "use 16000 or 48000 Hz."
-            )
+        if samples.size == 0:
+            raise ValueError("Audio is empty after sample-rate conversion.")
 
         return samples
 
@@ -101,19 +117,21 @@ class YAMNetBackend:
 
         try:
             waveform = self._read_mono_16k(audio_file)
-
-            scores, _, _ = self.model(
-                self.tf.convert_to_tensor(waveform)
-            )
+            tensor = self.tf.convert_to_tensor(waveform)
+            scores, _, _ = self.model(tensor)
             scores = scores.numpy()
 
-            if scores.size == 0:
+            if scores.size == 0 or scores.ndim != 2:
+                logger.warning("YAMNet returned no usable sound scores.")
                 return []
 
-            # Rank sound classes by their average score across the clip.
+            if scores.shape[1] != len(self.class_names):
+                raise RuntimeError(
+                    "YAMNet scores do not match the class-name list."
+                )
+
             mean_scores = scores.mean(axis=0)
             ranked = mean_scores.argsort()[::-1][:10]
-
             results = []
 
             for index in ranked:
@@ -135,11 +153,12 @@ class YAMNetBackend:
             return results
 
         except Exception:
-            logger.exception("YAMNet analysis failed.")
+            logger.exception("YAMNet analysis failed for %s.", audio_file)
             return []
 
 
 def analyze_audio(audio_file):
+    """Public entry point used by main.py."""
     global _backend
 
     if _backend is None:
