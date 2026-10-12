@@ -1,3 +1,4 @@
+
 import argparse
 import logging
 from datetime import datetime
@@ -13,56 +14,100 @@ from yamnet_analyzer import analyze_audio as analyze_environmental_sounds
 
 def run_once():
     logger = logging.getLogger("listeningbox")
+
     logger.info("Starting recording.")
     started_at = datetime.now()
+
     audio_file = record_audio()
     logger.info("Recording saved: %s", audio_file)
 
     processed_info = process_audio(audio_file)
     environment = read_environment(audio_file)
     environment["timestamp"] = started_at.isoformat(timespec="seconds")
-    recording_id = save_recording(audio_file, processed_info, environment)
+
+    recording_id = save_recording(
+        audio_file,
+        processed_info,
+        environment,
+    )
 
     logger.info(
         "Acoustic measurements: level=%s RMS=%s peak=%s",
-        environment["sound_level"], environment["audio_rms"],
-        environment["audio_peak"],
+        environment.get("sound_level"),
+        environment.get("audio_rms"),
+        environment.get("audio_peak"),
     )
 
     all_detections = []
-    # Keep each model independent: one failing must not stop the other.
-    for model_name, analyzer in (
+
+    # Run each model independently so one failure does not stop the other.
+    analyzers = (
         ("YAMNet", analyze_environmental_sounds),
         ("BirdNET", analyze_birds),
-    ):
+    )
+
+    for model_name, analyzer in analyzers:
         try:
-            detections = analyzer(audio_file, recorded_at=started_at) if model_name == "BirdNET" else analyzer(audio_file)
+            # Both analyzers accept the audio file path.
+            detections = analyzer(audio_file)
+
             for detection in detections or []:
+                # Keep a consistent model name in saved results.
+                detection.setdefault("model_name", model_name)
+
                 save_detection(recording_id, detection)
                 all_detections.append(detection)
+
+                label = (
+                    detection.get("label")
+                    or detection.get("species")
+                    or "Unknown"
+                )
+
                 logger.info(
                     "%s candidate: %s (confidence %.3f)",
-                    model_name, detection.get("label"),
-                    detection.get("confidence", 0.0),
+                    model_name,
+                    label,
+                    float(detection.get("confidence", 0.0)),
                 )
-        except Exception:
-            logger.exception("%s analysis failed for %s", model_name, audio_file)
 
-    logger.info("Cycle complete; %d candidate detections saved.", len(all_detections))
+        except Exception:
+            logger.exception(
+                "%s analysis failed for %s",
+                model_name,
+                audio_file,
+            )
+
+    logger.info(
+        "Cycle complete; %d candidate detections saved.",
+        len(all_detections),
+    )
+
     return audio_file, all_detections
 
 
 def main():
-    parser = argparse.ArgumentParser(description="The Listening Box audio pipeline")
-    parser.add_argument("--once", action="store_true", help="Record and analyze one clip")
+    parser = argparse.ArgumentParser(
+        description="The Listening Box audio pipeline"
+    )
+    parser.add_argument(
+        "--once",
+        action="store_true",
+        help="Record and analyze one clip",
+    )
     args = parser.parse_args()
+
     ensure_directories()
     initialize_database()
     setup_logging()
+
     if args.once:
         run_once()
     else:
-        parser.error("Use --once for a single recording or run scheduler.py for repetition.")
+        parser.error(
+            "Use --once for a single recording or run scheduler.py "
+            "for repetition."
+        )
 
 
 if __name__ == "__main__":
