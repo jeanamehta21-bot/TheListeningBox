@@ -1,8 +1,17 @@
 .venv/
+venv/
 __pycache__/
 *.py[cod]
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
 recordings/
 data/
 logs/
 *.wav
+
 .env
+.env.*
+!.env.example
