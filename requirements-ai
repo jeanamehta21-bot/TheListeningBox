@@ -1,0 +1,6 @@
+# Optional AI dependencies. Test these on your computer first.
+# TensorFlow can be too heavy or incompatible with Raspberry Pi 3 OS/Python builds.
+birdnet
+tensorflow
+tensorflow-hub
+numpy
