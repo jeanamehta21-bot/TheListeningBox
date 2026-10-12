@@ -1,79 +1,68 @@
-
 import argparse
 import logging
 from datetime import datetime
 
-from birdnet_analyzer import analyze_audio
+from birdnet_analyzer import analyze_audio as analyze_birds
 from database import initialize_database, save_detection, save_recording
 from environmental import read_environment
 from process_audio import process_audio
 from record_audio import record_audio
 from utils import ensure_directories, setup_logging
+from yamnet_analyzer import analyze_audio as analyze_environmental_sounds
 
 
 def run_once():
     logger = logging.getLogger("listeningbox")
-
     logger.info("Starting recording.")
-    recording_started_at = datetime.now().isoformat(timespec="seconds")
-
+    started_at = datetime.now()
     audio_file = record_audio()
     logger.info("Recording saved: %s", audio_file)
 
     processed_info = process_audio(audio_file)
-
-    # Analyze the actual saved audio file, not the environment beforehand.
     environment = read_environment(audio_file)
-    environment["timestamp"] = recording_started_at
-
-    recording_id = save_recording(
-        audio_file, processed_info, environment
-    )
+    environment["timestamp"] = started_at.isoformat(timespec="seconds")
+    recording_id = save_recording(audio_file, processed_info, environment)
 
     logger.info(
-        "Audio level: %s | RMS: %s | Peak: %s",
-        environment["sound_level"],
-        environment["audio_rms"],
+        "Acoustic measurements: level=%s RMS=%s peak=%s",
+        environment["sound_level"], environment["audio_rms"],
         environment["audio_peak"],
     )
 
-    try:
-        detections = analyze_audio(audio_file) or []
-    except Exception:
-        logger.exception("BirdNET analysis failed.")
-        detections = []
+    all_detections = []
+    # Keep each model independent: one failing must not stop the other.
+    for model_name, analyzer in (
+        ("YAMNet", analyze_environmental_sounds),
+        ("BirdNET", analyze_birds),
+    ):
+        try:
+            detections = analyzer(audio_file, recorded_at=started_at) if model_name == "BirdNET" else analyzer(audio_file)
+            for detection in detections or []:
+                save_detection(recording_id, detection)
+                all_detections.append(detection)
+                logger.info(
+                    "%s candidate: %s (confidence %.3f)",
+                    model_name, detection.get("label"),
+                    detection.get("confidence", 0.0),
+                )
+        except Exception:
+            logger.exception("%s analysis failed for %s", model_name, audio_file)
 
-    for detection in detections:
-        save_detection(
-            recording_id,
-            detection["species"],
-            detection["confidence"],
-            detection.get("start_seconds"),
-            detection.get("end_seconds"),
-        )
-        logger.info(
-            "Bird detection: %s %.3f",
-            detection["species"],
-            detection["confidence"],
-        )
-
-    logger.info("Cycle complete.")
-    return audio_file, detections
+    logger.info("Cycle complete; %d candidate detections saved.", len(all_detections))
+    return audio_file, all_detections
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--once", action="store_true")
+    parser = argparse.ArgumentParser(description="The Listening Box audio pipeline")
+    parser.add_argument("--once", action="store_true", help="Record and analyze one clip")
     args = parser.parse_args()
-
     ensure_directories()
     initialize_database()
     setup_logging()
-
     if args.once:
         run_once()
     else:
-        print("Use: python3 main.py --once")
+        parser.error("Use --once for a single recording or run scheduler.py for repetition.")
 
 
 if __name__ == "__main__":
