@@ -1,6 +1,9 @@
-# Optional AI dependencies. Test these on your computer first.
-# TensorFlow can be too heavy or incompatible with Raspberry Pi 3 OS/Python builds.
-birdnet
+# Optional AI dependencies for The Listening Box.
+# BirdNET 0.1.4 documents the ModelV2M4 API used by this adapter.
+# TensorFlow and TensorFlow Hub support the YAMNet classifier.
+# Test compatibility with your Python version and Raspberry Pi OS.
+
+birdnet==0.1.4
 tensorflow
 tensorflow-hub
 numpy
