@@ -12,6 +12,9 @@ from database import (
 
 app = Flask(__name__)
 
+from research_dashboard import research
+app.register_blueprint(research)
+
 HTML = """
 <!doctype html>
 <html lang="en">
