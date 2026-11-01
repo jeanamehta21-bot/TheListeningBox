@@ -158,9 +158,13 @@ python main.py --once
 
 Enabling both may exceed the Pi's available memory or processing capacity. If a model fails to load, check the log file.
 
-### BirdNET
+### BirdNET-Analyzer
 
-BirdNET is intended to produce bird-species candidates. Its Python API can vary by package version, so verify the adapter against the installed version before relying on the results.
+The project adapter calls the official `birdnet-analyze` command-line tool and requests the BirdNET 3.0 acoustic model. It converts the Analyzer CSV output into the Listening Box detection format, preserving species names, confidence scores, and segment start/end times.
+
+Install `requirements-ai.txt` in a dedicated environment on a capable analysis computer (Windows or another supported desktop). The full Analyzer is not intended to run inside the Raspberry Pi 3 recording scheduler, which should continue recording independently. Use Python 3.13 for the analysis environment until the full dependency stack explicitly supports newer Python versions.
+
+The official Analyzer is invoked as a separate process, so the project's `birdnet_analyzer.py` adapter filename does not replace or shadow the installed package. BirdNET 3.0 is explicitly selected; it is not the older `birdnet==0.1.4` API.
 
 ### YAMNet
 
