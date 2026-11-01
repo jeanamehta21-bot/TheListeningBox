@@ -185,3 +185,29 @@ Do not commit real recordings, database contents, logs, credentials, or private 
 The repository includes hardware-free tests for database operations, audio measurements, pipeline behavior, and YAMNet audio preparation.
 
 The tests do not prove that the microphone works or that BirdNET and YAMNet will run on the actual Raspberry Pi. Hardware and model testing is still required.
+
+
+## Research dashboard pages
+
+The Flask dashboard also provides local research views:
+
+- `/activity`: hourly and daily candidate-detection patterns.
+- `/timeline`: detections for a selected date.
+- `/species`: searchable candidate-label index.
+- `/review`: manually classify candidate detections as confirmed, uncertain, or false positive. Reviews are stored separately and do not delete raw model output.
+- `/insights`: descriptive dawn/night activity summaries, with cautions against over-interpreting small samples.
+- `/weather`: stored hourly weather history.
+- `/year`: yearly and monthly candidate-detection summary.
+- `/health`: database-level counts and last recording timestamp.
+
+### Weather setup
+
+Weather uses the free Open-Meteo forecast API without an API key. It is regional weather-model data, not a physical sensor at the microphone. Configure the actual monitoring site's `LATITUDE` and `LONGITUDE` in `config.py`; do not use a private home location unless the station is installed there. Then run:
+
+```bash
+python weather_sync.py
+```
+
+The sync retrieves the previous seven days plus the near-term forecast and stores hourly temperature, humidity, precipitation, wind speed, and weather code in a separate SQLite table. Re-run it periodically to refresh the history. No coordinates are committed to the public repository.
+
+The review queue, timeline, activity charts, species index, and yearly summary are based on existing database fields. They do not yet provide audio playback, spectrograms, photo galleries, verified eBird exports, live streaming, or ecological health scores. Those require additional validated data and/or services and should not be represented as available until implemented and tested.
