@@ -1,8 +1,4 @@
 # Optional AI dependencies for The Listening Box.
-# Test compatibility with your Python version and Raspberry Pi OS.
-
-birdnet==0.1.4
-tensorflow
-tensorflow-hub
-numpy
-scipy
+# Install this on a capable analysis computer, not the Raspberry Pi 3.
+# The official Analyzer installs its compatible BirdNET runtime dependencies.
+birdnet_analyzer>=2.4.0

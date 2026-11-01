@@ -32,7 +32,7 @@ BIRDNET_ENABLED = os.getenv(
     "LISTENING_BOX_BIRDNET", "0"
 ).strip().lower() in ("1", "true", "yes", "on")
 
-BIRDNET_MIN_CONFIDENCE = 0.50
+BIRDNET_MIN_CONFIDENCE = float(os.getenv("LISTENING_BOX_BIRDNET_MIN_CONFIDENCE", "0.50"))
 BIRDNET_LOCATION_FILTER = False
 
 # Optional general environmental sound classification.

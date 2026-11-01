@@ -1,162 +1,119 @@
+"""BirdNET-Analyzer CLI adapter for The Listening Box.
 
-"""BirdNET 2.4 adapter for The Listening Box.
-
-BirdNET is optional. If it is disabled, missing, or fails to load,
-recording and YAMNet analysis can continue.
+The full analyzer is intentionally run on a capable computer (such as the
+Windows laptop), not on the Raspberry Pi 3 recording process. Install the
+official birdnet_analyzer package and its birdnet-analyze command first.
 """
 
+import csv
 import logging
-from datetime import date
+import shutil
+import subprocess
+import tempfile
 from pathlib import Path
 
-from config import (
-    BIRDNET_ENABLED,
-    BIRDNET_MIN_CONFIDENCE,
-    BIRDNET_LOCATION_FILTER,
-    LATITUDE,
-    LONGITUDE,
-)
+from config import BIRDNET_ENABLED, BIRDNET_MIN_CONFIDENCE
 
 logger = logging.getLogger("listeningbox")
 
 
-class BirdNETBackend:
-    """Lazy-loading adapter for the birdnet Python package."""
-
-    def __init__(self):
-        self.available = False
-        self.model = None
-
-        if not BIRDNET_ENABLED:
-            logger.info("BirdNET disabled by configuration.")
-            return
-
-        try:
-            # Import only when BirdNET is enabled.
-            from birdnet.models import ModelV2M4
-
-            self.model = ModelV2M4()
-            self.available = True
-            logger.info("BirdNET 2.4 model loaded.")
-
-        except Exception:
-            logger.exception(
-                "BirdNET could not load. Continuing without BirdNET."
-            )
-
-    def _predict(self, audio_path):
-        """Run BirdNET and return interval/species predictions."""
-
-        location_filter = (
-            BIRDNET_LOCATION_FILTER
-            and LATITUDE is not None
-            and LONGITUDE is not None
+def _analyzer_command():
+    """Return the installed official BirdNET-Analyzer command."""
+    command = shutil.which("birdnet-analyze")
+    if command is None:
+        raise RuntimeError(
+            "BirdNET-Analyzer is not installed in this Python environment. "
+            "Install it with: python -m pip install -r requirements-ai.txt"
         )
-
-        if location_filter:
-            # Use the current calendar week rather than a fixed week.
-            week = date.today().isocalendar().week
-
-            try:
-                species_in_area = (
-                    self.model.predict_species_at_location_and_time(
-                        LATITUDE,
-                        LONGITUDE,
-                        week=week,
-                    )
-                )
-
-                return self.model.predict_species_within_audio_file(
-                    audio_path,
-                    filter_species=set(species_in_area.keys()),
-                )
-
-            except Exception:
-                logger.exception(
-                    "Location-filtered BirdNET prediction failed. "
-                    "Retrying without location filtering."
-                )
-
-        elif BIRDNET_LOCATION_FILTER:
-            logger.warning(
-                "Location filtering requested, but coordinates are missing. "
-                "Analyzing without location filtering."
-            )
-
-        return self.model.predict_species_within_audio_file(audio_path)
-
-    def analyze(self, audio_file):
-        if not self.available:
-            return []
-
-        audio_path = Path(audio_file)
-
-        if not audio_path.is_file():
-            logger.error("Audio file does not exist: %s", audio_path)
-            return []
-
-        try:
-            predictions = self._predict(audio_path)
-            results = []
-
-            for interval, species_scores in predictions.items():
-                if not species_scores:
-                    continue
-
-                # Keep the strongest candidate for each interval.
-                species, confidence = max(
-                    species_scores.items(),
-                    key=lambda item: float(item[1]),
-                )
-
-                confidence = float(confidence)
-
-                if confidence < BIRDNET_MIN_CONFIDENCE:
-                    continue
-
-                if "_" in species:
-                    scientific_name, common_name = species.split("_", 1)
-                else:
-                    scientific_name = None
-                    common_name = species
-
-                start_seconds, end_seconds = interval
-
-                results.append({
-                    "model_name": "BirdNET",
-                    "category": "bird",
-                    "label": common_name,
-                    "species": common_name,
-                    "scientific_name": scientific_name,
-                    "confidence": confidence,
-                    "start_seconds": float(start_seconds),
-                    "end_seconds": float(end_seconds),
-                })
-
-            logger.info(
-                "BirdNET saved %d candidates at confidence >= %.2f.",
-                len(results),
-                BIRDNET_MIN_CONFIDENCE,
-            )
-
-            return results
-
-        except Exception:
-            logger.exception(
-                "BirdNET analysis failed for %s.", audio_path
-            )
-            return []
-
-
-_backend = None
+    return command
 
 
 def analyze_audio(audio_file):
-    """Public entry point used by main.py."""
+    """Return BirdNET-Analyzer detections in the project's database format."""
+    if not BIRDNET_ENABLED:
+        logger.info("BirdNET disabled by configuration.")
+        return []
 
-    global _backend
+    audio_path = Path(audio_file)
+    if not audio_path.is_file():
+        logger.error("BirdNET audio file does not exist: %s", audio_path)
+        return []
 
-    if _backend is None:
-        _backend = BirdNETBackend()
+    command = _analyzer_command()
 
-    return _backend.analyze(audio_file)
+    with tempfile.TemporaryDirectory(prefix="listeningbox-birdnet-") as temp:
+        output_dir = Path(temp)
+        args = [
+            command,
+            str(audio_path),
+            "--birdnet", "3.0",
+            "--min_conf", str(BIRDNET_MIN_CONFIDENCE),
+            "--threads", "1",
+            "--batch_size", "1",
+            "--merge_consecutive", "0",
+            "--rtype", "csv",
+            "--output", str(output_dir),
+            "--quiet",
+        ]
+
+        logger.info("Running BirdNET-Analyzer 3.0 for %s", audio_path.name)
+        completed = subprocess.run(
+            args,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if completed.returncode != 0:
+            detail = (completed.stderr or completed.stdout).strip()
+            raise RuntimeError(
+                "BirdNET-Analyzer failed "
+                f"(exit {completed.returncode}): {detail[-4000:]}"
+            )
+
+        result_files = list(output_dir.glob("*.BirdNET.results.csv"))
+        if not result_files:
+            result_files = list(output_dir.glob("*.csv"))
+        if len(result_files) != 1:
+            raise RuntimeError(
+                "BirdNET-Analyzer did not produce exactly one results CSV "
+                f"for {audio_path.name}; found {len(result_files)}."
+            )
+
+        detections = []
+        with result_files[0].open(
+            "r", encoding="utf-8-sig", newline=""
+        ) as handle:
+            reader = csv.DictReader(handle)
+            required = {
+                "Start (s)", "End (s)", "Scientific name",
+                "Common name", "Confidence",
+            }
+            if not required.issubset(set(reader.fieldnames or [])):
+                raise RuntimeError(
+                    "Unexpected BirdNET-Analyzer CSV columns: "
+                    f"{reader.fieldnames}"
+                )
+
+            for row in reader:
+                confidence = float(row["Confidence"])
+                if confidence < BIRDNET_MIN_CONFIDENCE:
+                    continue
+                common_name = row["Common name"].strip()
+                scientific_name = row["Scientific name"].strip()
+                detections.append({
+                    "model_name": "BirdNET",
+                    "category": "bird",
+                    "label": common_name or scientific_name or "Unknown",
+                    "species": common_name or scientific_name or "Unknown",
+                    "scientific_name": scientific_name or None,
+                    "confidence": confidence,
+                    "start_seconds": float(row["Start (s)"]),
+                    "end_seconds": float(row["End (s)"]),
+                })
+
+        logger.info(
+            "BirdNET-Analyzer found %d candidates at confidence >= %.2f.",
+            len(detections),
+            BIRDNET_MIN_CONFIDENCE,
+        )
+        return detections
