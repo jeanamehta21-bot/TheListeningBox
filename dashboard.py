@@ -206,7 +206,7 @@ td strong { font-weight: 700; }
     <a href="#overview">Overview</a>
     <a href="#activity">Activity</a>
     <a href="#detections">Detections</a>
-    <a href="#recordings">Recordings</a>
+    <a href="#recordings">Recordings</a><a href="/activity">Analytics</a><a href="/timeline">Timeline</a><a href="/species">Species</a><a href="/review">Review</a><a href="/insights">Insights</a><a href="/weather">Weather</a><a href="/year">Year in review</a><a href="/health">Station health</a>
   </nav>
 
   <section id="overview">
