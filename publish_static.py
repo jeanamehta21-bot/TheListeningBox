@@ -172,7 +172,7 @@ def write_pdf(payload):
                   "This report summarizes the Listening Box SQLite recordings and detections tables. "
                   "Counts are model-generated candidate detections. Diversity indices describe the "
                   "relative frequency of candidate labels; they are not a verified estimate of animal "
-                  "abundance or a complete ecological census.", styles["BodyText"
+                  "abundance or a complete ecological census.", styles["BodyText"]
               )]
     for note in payload["interpretation_notes"]:
         story += [Spacer(1, 5), Paragraph("• " + note, styles["BodyText"])]
