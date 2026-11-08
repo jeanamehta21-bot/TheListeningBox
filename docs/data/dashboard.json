@@ -1,15 +1,311 @@
 {
-  "generated_at": null,
+  "generated_at": "2026-11-08T15:18:46",
   "summary": {
-    "recordings": 0,
-    "detections": 0,
-    "candidate_labels": 0,
-    "average_confidence": null,
-    "total_recording_hours": 0,
-    "shannon_diversity": null,
-    "simpson_diversity": null
+    "recordings": 36,
+    "detections": 180,
+    "candidate_labels": 59,
+    "average_confidence": 0.3622297722222222,
+    "total_recording_hours": 0.29305555555555557,
+    "shannon_diversity": 3.540762542478445,
+    "simpson_diversity": 0.9511728395061728
   },
-  "species": [],
+  "species": [
+    {
+      "label": "White-breasted Nuthatch",
+      "scientific_name": "Sitta carolinensis",
+      "detections": 25
+    },
+    {
+      "label": "Red-bellied Woodpecker",
+      "scientific_name": "Melanerpes carolinus",
+      "detections": 18
+    },
+    {
+      "label": "Chimpanzee",
+      "scientific_name": "Pan troglodytes",
+      "detections": 11
+    },
+    {
+      "label": "Blue Jay",
+      "scientific_name": "Cyanocitta cristata",
+      "detections": 11
+    },
+    {
+      "label": "Asian Elephant",
+      "scientific_name": "Elephas maximus",
+      "detections": 10
+    },
+    {
+      "label": "Human",
+      "scientific_name": "Homo sapiens",
+      "detections": 6
+    },
+    {
+      "label": "White-throated Sparrow",
+      "scientific_name": "Zonotrichia albicollis",
+      "detections": 6
+    },
+    {
+      "label": "American Goldfinch",
+      "scientific_name": "Spinus tristis",
+      "detections": 4
+    },
+    {
+      "label": "Eastern Wood Pewee",
+      "scientific_name": "Contopus virens",
+      "detections": 4
+    },
+    {
+      "label": "Harbor Seal",
+      "scientific_name": "Phoca vitulina",
+      "detections": 4
+    },
+    {
+      "label": "Gray Shieldback",
+      "scientific_name": "Atlanticus dorsalis",
+      "detections": 4
+    },
+    {
+      "label": "Weddell Seal",
+      "scientific_name": "Leptonychotes weddellii",
+      "detections": 3
+    },
+    {
+      "label": "Red Crossbill",
+      "scientific_name": "Loxia curvirostra",
+      "detections": 3
+    },
+    {
+      "label": "Yellow-rumped Warbler",
+      "scientific_name": "Setophaga coronata",
+      "detections": 3
+    },
+    {
+      "label": "Bowhead Whale",
+      "scientific_name": "Balaena mysticetus",
+      "detections": 3
+    },
+    {
+      "label": "Lucifer Sheartail",
+      "scientific_name": "Calothorax lucifer",
+      "detections": 3
+    },
+    {
+      "label": "Western Honey Bee",
+      "scientific_name": "Apis mellifera",
+      "detections": 3
+    },
+    {
+      "label": "Red Deer",
+      "scientific_name": "Cervus elaphus",
+      "detections": 3
+    },
+    {
+      "label": "Great Horned Owl",
+      "scientific_name": "Bubo virginianus",
+      "detections": 3
+    },
+    {
+      "label": "Common Nighthawk",
+      "scientific_name": "Chordeiles minor",
+      "detections": 3
+    },
+    {
+      "label": "Eastern Wood-Pewee",
+      "scientific_name": "Contopus virens",
+      "detections": 3
+    },
+    {
+      "label": "Peregrine Falcon",
+      "scientific_name": "Falco peregrinus",
+      "detections": 2
+    },
+    {
+      "label": "Bee Hummingbird",
+      "scientific_name": "Mellisuga helenae",
+      "detections": 2
+    },
+    {
+      "label": "Red Fox",
+      "scientific_name": "Vulpes vulpes",
+      "detections": 2
+    },
+    {
+      "label": "Western House Martin",
+      "scientific_name": "Delichon urbicum",
+      "detections": 2
+    },
+    {
+      "label": "White-collared Manakin",
+      "scientific_name": "Manacus candei",
+      "detections": 2
+    },
+    {
+      "label": "Roesel's Bush-cricket",
+      "scientific_name": "Roeseliana roeselii",
+      "detections": 2
+    },
+    {
+      "label": "Rock Dove",
+      "scientific_name": "Columba livia",
+      "detections": 2
+    },
+    {
+      "label": "Northern Saw-whet Owl",
+      "scientific_name": "Aegolius acadicus",
+      "detections": 2
+    },
+    {
+      "label": "Texas Bush Katydid",
+      "scientific_name": "Scudderia texensis",
+      "detections": 2
+    },
+    {
+      "label": "Gray Wolf",
+      "scientific_name": "Canis lupus",
+      "detections": 1
+    },
+    {
+      "label": "Lion",
+      "scientific_name": "Panthera leo",
+      "detections": 1
+    },
+    {
+      "label": "Harp Seal",
+      "scientific_name": "Pagophilus groenlandicus",
+      "detections": 1
+    },
+    {
+      "label": "Eurasian Chaffinch",
+      "scientific_name": "Fringilla coelebs",
+      "detections": 1
+    },
+    {
+      "label": "Dusky-capped Flycatcher",
+      "scientific_name": "Myiarchus tuberculifer",
+      "detections": 1
+    },
+    {
+      "label": "Common Swift",
+      "scientific_name": "Apus apus",
+      "detections": 1
+    },
+    {
+      "label": "Mallard",
+      "scientific_name": "Anas platyrhynchos",
+      "detections": 1
+    },
+    {
+      "label": "Western Barn Owl",
+      "scientific_name": "Tyto alba",
+      "detections": 1
+    },
+    {
+      "label": "Grey Catbird",
+      "scientific_name": "Dumetella carolinensis",
+      "detections": 1
+    },
+    {
+      "label": "Greater Roadrunner",
+      "scientific_name": "Geococcyx californianus",
+      "detections": 1
+    },
+    {
+      "label": "Blue-grey Gnatcatcher",
+      "scientific_name": "Polioptila caerulea",
+      "detections": 1
+    },
+    {
+      "label": "Hooded Crow",
+      "scientific_name": "Corvus cornix",
+      "detections": 1
+    },
+    {
+      "label": "Eurasian Tree Sparrow",
+      "scientific_name": "Passer montanus",
+      "detections": 1
+    },
+    {
+      "label": "House Sparrow",
+      "scientific_name": "Passer domesticus",
+      "detections": 1
+    },
+    {
+      "label": "Tawny Owl",
+      "scientific_name": "Strix aluco",
+      "detections": 1
+    },
+    {
+      "label": "White-bearded Manakin",
+      "scientific_name": "Manacus manacus",
+      "detections": 1
+    },
+    {
+      "label": "Golden-collared Manakin",
+      "scientific_name": "Manacus vitellinus",
+      "detections": 1
+    },
+    {
+      "label": "Hooded Oriole",
+      "scientific_name": "Icterus cucullatus",
+      "detections": 1
+    },
+    {
+      "label": "Eurasian Bittern",
+      "scientific_name": "Botaurus stellaris",
+      "detections": 1
+    },
+    {
+      "label": "Northern Pygmy Owl",
+      "scientific_name": "Glaucidium gnoma",
+      "detections": 1
+    },
+    {
+      "label": "Two-spotted Tree Cricket",
+      "scientific_name": "Neoxabea bipunctata",
+      "detections": 1
+    },
+    {
+      "label": "Savannah Sparrow",
+      "scientific_name": "Passerculus sandwichensis",
+      "detections": 1
+    },
+    {
+      "label": "Eurasian Magpie",
+      "scientific_name": "Pica pica",
+      "detections": 1
+    },
+    {
+      "label": "Common Moorhen",
+      "scientific_name": "Gallinula chloropus",
+      "detections": 1
+    },
+    {
+      "label": "Savanna Nightjar",
+      "scientific_name": "Caprimulgus affinis",
+      "detections": 1
+    },
+    {
+      "label": "Eurasian Eagle-Owl",
+      "scientific_name": "Bubo bubo",
+      "detections": 1
+    },
+    {
+      "label": "Long-eared Owl",
+      "scientific_name": "Asio otus",
+      "detections": 1
+    },
+    {
+      "label": "Brown Creeper",
+      "scientific_name": "Certhia americana",
+      "detections": 1
+    },
+    {
+      "label": "Dunlin",
+      "scientific_name": "Calidris alpina",
+      "detections": 1
+    }
+  ],
   "hourly": [
     {
       "hour": 0,
@@ -108,10 +404,57 @@
       "detections": 0
     }
   ],
-  "daily": [],
-  "models": [],
-  "categories": [],
+  "daily": [
+    {
+      "date": "2026-10-25",
+      "detections": 60
+    },
+    {
+      "date": "2026-10-31",
+      "detections": 52
+    },
+    {
+      "date": "2026-11-01",
+      "detections": 17
+    },
+    {
+      "date": "2026-11-02",
+      "detections": 1
+    },
+    {
+      "date": "2026-11-03",
+      "detections": 8
+    },
+    {
+      "date": "2026-11-04",
+      "detections": 26
+    }
+  ],
+  "models": [
+    {
+      "model": "Unidentified classifier",
+      "detections": 125
+    },
+    {
+      "model": "BirdNET",
+      "detections": 55
+    }
+  ],
+  "categories": [
+    {
+      "category": "Unverified classifier label",
+      "detections": 125
+    },
+    {
+      "category": "Bird",
+      "detections": 55
+    }
+  ],
   "interpretation_notes": [
-    "No public dataset exported yet. Run publish_static.py on the computer containing the local Listening Box database."
+    "All classifier outputs are candidate detections, not independently verified observations.",
+    "Candidate-label frequencies are not a complete ecological census.",
+    "Detection counts depend on recording effort, microphone placement, weather, model settings and confidence thresholds.",
+    "Model confidence is a score, not a guarantee that a species was present.",
+    "Unidentified classifier results are kept separate from BirdNET results."
   ]
 }
