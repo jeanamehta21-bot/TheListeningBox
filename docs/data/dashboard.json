@@ -1,0 +1,117 @@
+{
+  "generated_at": null,
+  "summary": {
+    "recordings": 0,
+    "detections": 0,
+    "candidate_labels": 0,
+    "average_confidence": null,
+    "total_recording_hours": 0,
+    "shannon_diversity": null,
+    "simpson_diversity": null
+  },
+  "species": [],
+  "hourly": [
+    {
+      "hour": 0,
+      "detections": 0
+    },
+    {
+      "hour": 1,
+      "detections": 0
+    },
+    {
+      "hour": 2,
+      "detections": 0
+    },
+    {
+      "hour": 3,
+      "detections": 0
+    },
+    {
+      "hour": 4,
+      "detections": 0
+    },
+    {
+      "hour": 5,
+      "detections": 0
+    },
+    {
+      "hour": 6,
+      "detections": 0
+    },
+    {
+      "hour": 7,
+      "detections": 0
+    },
+    {
+      "hour": 8,
+      "detections": 0
+    },
+    {
+      "hour": 9,
+      "detections": 0
+    },
+    {
+      "hour": 10,
+      "detections": 0
+    },
+    {
+      "hour": 11,
+      "detections": 0
+    },
+    {
+      "hour": 12,
+      "detections": 0
+    },
+    {
+      "hour": 13,
+      "detections": 0
+    },
+    {
+      "hour": 14,
+      "detections": 0
+    },
+    {
+      "hour": 15,
+      "detections": 0
+    },
+    {
+      "hour": 16,
+      "detections": 0
+    },
+    {
+      "hour": 17,
+      "detections": 0
+    },
+    {
+      "hour": 18,
+      "detections": 0
+    },
+    {
+      "hour": 19,
+      "detections": 0
+    },
+    {
+      "hour": 20,
+      "detections": 0
+    },
+    {
+      "hour": 21,
+      "detections": 0
+    },
+    {
+      "hour": 22,
+      "detections": 0
+    },
+    {
+      "hour": 23,
+      "detections": 0
+    }
+  ],
+  "daily": [],
+  "models": [],
+  "categories": [],
+  "interpretation_notes": [
+    "No public dataset exported yet. Run publish_static.py on the computer containing the local Listening Box database."
+  ]
+}
