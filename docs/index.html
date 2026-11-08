@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#123b39"><meta name="description" content="The Listening Box acoustic biodiversity research dashboard.">
+<title>The Listening Box | Research Dashboard</title><link rel="stylesheet" href="./style.css">
+</head>
+<body><main class="shell">
+<header class="topbar"><a class="brand" href="./"><span class="mark">◖</span><span><strong>THE LISTENING BOX</strong><small>Acoustic biodiversity research</small></span></a><span class="status"><i></i> Public research dashboard</span></header>
+<section class="hero"><div><p class="eyebrow">BIOACOUSTIC FIELD RESEARCH</p><h1>Listen closer.<br>Understand more.</h1><p class="intro">Explore summarized candidate detections and acoustic activity collected by The Listening Box.</p><p class="updated" id="updated">Loading dataset…</p></div>
+<aside class="report-card"><span class="eyebrow">RESEARCH REPORT</span><h2>Acoustic Biodiversity Analysis</h2><p>Printable summary of the dataset, candidate labels, activity patterns and methodological limitations.</p><a class="button" href="./reports/listening-box-report.pdf">View PDF report</a></aside></section>
+<nav class="nav"><a href="#overview">Overview</a><a href="#species">Candidate labels</a><a href="#activity">Activity</a><a href="#methods">Methods & limitations</a></nav>
+<section id="overview"><div class="section-head"><div><h2>Dataset overview</h2><p>Aggregate results from the local Listening Box database</p></div></div>
+<div class="metrics"><article class="metric"><span>Recordings</span><strong id="recordings">—</strong></article><article class="metric"><span>Candidate detections</span><strong id="detections">—</strong></article><article class="metric"><span>Distinct labels</span><strong id="labels">—</strong></article><article class="metric"><span>Mean confidence</span><strong id="confidence">—</strong></article></div>
+<div class="metrics secondary"><article class="metric"><span>Recording duration</span><strong id="duration">—</strong></article><article class="metric"><span>Shannon index*</span><strong id="shannon">—</strong></article><article class="metric"><span>Simpson index*</span><strong id="simpson">—</strong></article></div><p class="footnote">*Calculated from candidate-label detection frequencies. These are descriptive indices, not verified ecological census estimates.</p></section>
+<section id="species"><div class="section-head"><div><h2>Most frequent candidate labels</h2><p>Model outputs, not independently verified species observations</p></div></div><div class="panel"><input id="species-search" class="search" type="search" placeholder="Search candidate labels…" aria-label="Search candidate labels"><div id="species-list" class="species-list"><p class="muted">Loading…</p></div></div></section>
+<section id="activity"><div class="section-head"><div><h2>Activity patterns</h2><p>Distribution of saved detections by recording timestamp</p></div></div><div class="two-col"><article class="panel"><h3>Detections by hour</h3><div id="hourly-chart" class="bar-chart"></div></article><article class="panel"><h3>Recent daily activity</h3><div id="daily-chart" class="daily-chart"></div></article></div></section>
+<section id="methods"><div class="section-head"><div><h2>Methods & limitations</h2><p>How to interpret these results responsibly</p></div></div><div class="panel"><ul id="notes"><li>Loading interpretation notes…</li></ul><p class="privacy-note">This public dashboard contains aggregate summaries only. It does not host original audio files, local recording paths, the raw database, or exact station coordinates.</p></div></section>
+<footer>THE LISTENING BOX · Acoustic biodiversity research · <span id="footer-date"></span></footer>
+</main><script src="./app.js" defer></script></body></html>
