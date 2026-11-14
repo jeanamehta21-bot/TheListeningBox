@@ -44,7 +44,7 @@ async function load(){
  try{
   const response=await fetch(DATA_URL,{cache:"no-store"});if(!response.ok)throw new Error("HTTP "+response.status);
   const data=await response.json(),s=data.summary||{};
-  set("recordings",fmt(s.recordings));set("detections",fmt(s.detections));set("labels",fmt(s.candidate_labels));
+  set("recordings",fmt(s.recordings));set("detections",fmt(s.detections));set("labels",fmt(s.candidate_labels));set("filtered-out",fmt(s.filtered_out_detections));
   set("confidence",s.average_confidence==null?"—":(100*s.average_confidence).toFixed(1)+"%");
   set("duration",(Number(s.total_recording_hours||0)).toFixed(2)+" h");
   set("shannon",s.shannon_diversity==null?"—":Number(s.shannon_diversity).toFixed(3));
