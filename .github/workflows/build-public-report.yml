@@ -1,0 +1,36 @@
+name: Build public PDF report
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/data/dashboard.json"
+      - "scripts/build_public_report.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install PDF dependency
+        run: python -m pip install reportlab
+      - name: Generate PDF from public dashboard data
+        run: python scripts/build_public_report.py
+      - name: Commit generated report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/reports/listening-box-report.pdf
+          if git diff --cached --quiet; then
+            echo "PDF is already up to date."
+          else
+            git commit -m "Build public Listening Box PDF report"
+            git push
+          fi
