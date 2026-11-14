@@ -2,12 +2,13 @@
   "generated_at": "2026-11-08T15:18:46",
   "summary": {
     "recordings": 36,
-    "detections": 180,
-    "candidate_labels": 59,
-    "average_confidence": 0.3622297722222222,
+    "detections": 97,
+    "candidate_labels": 21,
+    "average_confidence": null,
     "total_recording_hours": 0.29305555555555557,
-    "shannon_diversity": 3.540762542478445,
-    "simpson_diversity": 0.9511728395061728
+    "shannon_diversity": 2.4496102453566815,
+    "simpson_diversity": 0.8695929429269847,
+    "filtered_out_detections": 83
   },
   "species": [
     {
@@ -21,24 +22,14 @@
       "detections": 18
     },
     {
-      "label": "Chimpanzee",
-      "scientific_name": "Pan troglodytes",
-      "detections": 11
-    },
-    {
       "label": "Blue Jay",
       "scientific_name": "Cyanocitta cristata",
       "detections": 11
     },
     {
-      "label": "Asian Elephant",
-      "scientific_name": "Elephas maximus",
-      "detections": 10
-    },
-    {
-      "label": "Human",
-      "scientific_name": "Homo sapiens",
-      "detections": 6
+      "label": "Eastern Wood Pewee",
+      "scientific_name": "Contopus virens",
+      "detections": 7
     },
     {
       "label": "White-throated Sparrow",
@@ -51,26 +42,6 @@
       "detections": 4
     },
     {
-      "label": "Eastern Wood Pewee",
-      "scientific_name": "Contopus virens",
-      "detections": 4
-    },
-    {
-      "label": "Harbor Seal",
-      "scientific_name": "Phoca vitulina",
-      "detections": 4
-    },
-    {
-      "label": "Gray Shieldback",
-      "scientific_name": "Atlanticus dorsalis",
-      "detections": 4
-    },
-    {
-      "label": "Weddell Seal",
-      "scientific_name": "Leptonychotes weddellii",
-      "detections": 3
-    },
-    {
       "label": "Red Crossbill",
       "scientific_name": "Loxia curvirostra",
       "detections": 3
@@ -78,26 +49,6 @@
     {
       "label": "Yellow-rumped Warbler",
       "scientific_name": "Setophaga coronata",
-      "detections": 3
-    },
-    {
-      "label": "Bowhead Whale",
-      "scientific_name": "Balaena mysticetus",
-      "detections": 3
-    },
-    {
-      "label": "Lucifer Sheartail",
-      "scientific_name": "Calothorax lucifer",
-      "detections": 3
-    },
-    {
-      "label": "Western Honey Bee",
-      "scientific_name": "Apis mellifera",
-      "detections": 3
-    },
-    {
-      "label": "Red Deer",
-      "scientific_name": "Cervus elaphus",
       "detections": 3
     },
     {
@@ -111,38 +62,8 @@
       "detections": 3
     },
     {
-      "label": "Eastern Wood-Pewee",
-      "scientific_name": "Contopus virens",
-      "detections": 3
-    },
-    {
       "label": "Peregrine Falcon",
       "scientific_name": "Falco peregrinus",
-      "detections": 2
-    },
-    {
-      "label": "Bee Hummingbird",
-      "scientific_name": "Mellisuga helenae",
-      "detections": 2
-    },
-    {
-      "label": "Red Fox",
-      "scientific_name": "Vulpes vulpes",
-      "detections": 2
-    },
-    {
-      "label": "Western House Martin",
-      "scientific_name": "Delichon urbicum",
-      "detections": 2
-    },
-    {
-      "label": "White-collared Manakin",
-      "scientific_name": "Manacus candei",
-      "detections": 2
-    },
-    {
-      "label": "Roesel's Bush-cricket",
-      "scientific_name": "Roeseliana roeselii",
       "detections": 2
     },
     {
@@ -156,48 +77,8 @@
       "detections": 2
     },
     {
-      "label": "Texas Bush Katydid",
-      "scientific_name": "Scudderia texensis",
-      "detections": 2
-    },
-    {
-      "label": "Gray Wolf",
-      "scientific_name": "Canis lupus",
-      "detections": 1
-    },
-    {
-      "label": "Lion",
-      "scientific_name": "Panthera leo",
-      "detections": 1
-    },
-    {
-      "label": "Harp Seal",
-      "scientific_name": "Pagophilus groenlandicus",
-      "detections": 1
-    },
-    {
-      "label": "Eurasian Chaffinch",
-      "scientific_name": "Fringilla coelebs",
-      "detections": 1
-    },
-    {
-      "label": "Dusky-capped Flycatcher",
-      "scientific_name": "Myiarchus tuberculifer",
-      "detections": 1
-    },
-    {
-      "label": "Common Swift",
-      "scientific_name": "Apus apus",
-      "detections": 1
-    },
-    {
       "label": "Mallard",
       "scientific_name": "Anas platyrhynchos",
-      "detections": 1
-    },
-    {
-      "label": "Western Barn Owl",
-      "scientific_name": "Tyto alba",
       "detections": 1
     },
     {
@@ -206,18 +87,8 @@
       "detections": 1
     },
     {
-      "label": "Greater Roadrunner",
-      "scientific_name": "Geococcyx californianus",
-      "detections": 1
-    },
-    {
       "label": "Blue-grey Gnatcatcher",
       "scientific_name": "Polioptila caerulea",
-      "detections": 1
-    },
-    {
-      "label": "Hooded Crow",
-      "scientific_name": "Corvus cornix",
       "detections": 1
     },
     {
@@ -231,68 +102,8 @@
       "detections": 1
     },
     {
-      "label": "Tawny Owl",
-      "scientific_name": "Strix aluco",
-      "detections": 1
-    },
-    {
-      "label": "White-bearded Manakin",
-      "scientific_name": "Manacus manacus",
-      "detections": 1
-    },
-    {
-      "label": "Golden-collared Manakin",
-      "scientific_name": "Manacus vitellinus",
-      "detections": 1
-    },
-    {
-      "label": "Hooded Oriole",
-      "scientific_name": "Icterus cucullatus",
-      "detections": 1
-    },
-    {
-      "label": "Eurasian Bittern",
-      "scientific_name": "Botaurus stellaris",
-      "detections": 1
-    },
-    {
-      "label": "Northern Pygmy Owl",
-      "scientific_name": "Glaucidium gnoma",
-      "detections": 1
-    },
-    {
-      "label": "Two-spotted Tree Cricket",
-      "scientific_name": "Neoxabea bipunctata",
-      "detections": 1
-    },
-    {
       "label": "Savannah Sparrow",
       "scientific_name": "Passerculus sandwichensis",
-      "detections": 1
-    },
-    {
-      "label": "Eurasian Magpie",
-      "scientific_name": "Pica pica",
-      "detections": 1
-    },
-    {
-      "label": "Common Moorhen",
-      "scientific_name": "Gallinula chloropus",
-      "detections": 1
-    },
-    {
-      "label": "Savanna Nightjar",
-      "scientific_name": "Caprimulgus affinis",
-      "detections": 1
-    },
-    {
-      "label": "Eurasian Eagle-Owl",
-      "scientific_name": "Bubo bubo",
-      "detections": 1
-    },
-    {
-      "label": "Long-eared Owl",
-      "scientific_name": "Asio otus",
       "detections": 1
     },
     {
@@ -432,29 +243,20 @@
   ],
   "models": [
     {
-      "model": "Unidentified classifier",
-      "detections": 125
-    },
-    {
-      "model": "BirdNET",
-      "detections": 55
+      "model": "BirdNET (filtered Connecticut bird candidates)",
+      "detections": 97
     }
   ],
   "categories": [
     {
-      "category": "Unverified classifier label",
-      "detections": 125
-    },
-    {
       "category": "Bird",
-      "detections": 55
+      "detections": 97
     }
   ],
   "interpretation_notes": [
-    "All classifier outputs are candidate detections, not independently verified observations.",
-    "Candidate-label frequencies are not a complete ecological census.",
-    "Detection counts depend on recording effort, microphone placement, weather, model settings and confidence thresholds.",
-    "Model confidence is a score, not a guarantee that a species was present.",
-    "Unidentified classifier results are kept separate from BirdNET results."
+    "Species list is restricted to a conservative allowlist of Connecticut bird candidates.",
+    "These are automated model predictions, not independently verified observations.",
+    "Non-bird and out-of-region classifier labels are excluded from the species list; original recordings and source records are not deleted.",
+    "Some real local or migratory species may be absent because the allowlist is intentionally conservative."
   ]
 }
