@@ -24,6 +24,65 @@ def safe_float(value):
         return None
 
 
+# Conservative allowlist for bird species recorded in Connecticut.
+# Scientific names are used because common-name spellings can vary.
+# Rare and migratory Connecticut birds are retained when they are on the
+# state checklist; clearly non-local taxa and non-bird classifier labels are not.
+CONNECTICUT_BIRD_SCIENTIFIC_NAMES = {
+    "Sitta carolinensis",       # White-breasted Nuthatch
+    "Melanerpes carolinus",     # Red-bellied Woodpecker
+    "Cyanocitta cristata",      # Blue Jay
+    "Zonotrichia albicollis",   # White-throated Sparrow
+    "Spinus tristis",           # American Goldfinch
+    "Contopus virens",          # Eastern Wood-Pewee
+    "Loxia curvirostra",        # Red Crossbill
+    "Setophaga coronata",       # Yellow-rumped Warbler
+    "Bubo virginianus",         # Great Horned Owl
+    "Chordeiles minor",         # Common Nighthawk
+    "Falco peregrinus",         # Peregrine Falcon
+    "Aegolius acadicus",        # Northern Saw-whet Owl
+    "Columba livia",            # Rock Pigeon / Rock Dove
+    "Anas platyrhynchos",       # Mallard
+    "Dumetella carolinensis",   # Gray Catbird
+    "Polioptila caerulea",      # Blue-gray Gnatcatcher
+    "Passer montanus",          # Eurasian Tree Sparrow
+    "Passer domesticus",        # House Sparrow
+    "Passerculus sandwichensis",# Savannah Sparrow
+    "Certhia americana",        # Brown Creeper
+    "Calidris alpina",          # Dunlin
+    "Turdus migratorius",       # American Robin
+    "Cardinalis cardinalis",    # Northern Cardinal
+    "Poecile atricapillus",     # Black-capped Chickadee
+    "Baeolophus bicolor",       # Tufted Titmouse
+    "Dryobates pubescens",      # Downy Woodpecker
+    "Agelaius phoeniceus",      # Red-winged Blackbird
+    "Melospiza melodia",        # Song Sparrow
+    "Junco hyemalis",           # Dark-eyed Junco
+    "Quiscalus quiscula",       # Common Grackle
+    "Melanerpes erythrocephalus",# Red-headed Woodpecker
+    "Icterus galbula",          # Baltimore Oriole
+    "Geothlypis trichas",       # Common Yellowthroat
+    "Corvus brachyrhynchos",    # American Crow
+    "Sitta canadensis",         # Red-breasted Nuthatch
+    "Sayornis phoebe",          # Eastern Phoebe
+    "Spizella passerina",       # Chipping Sparrow
+    "Zenaida macroura",         # Mourning Dove
+    "Buteo jamaicensis",        # Red-tailed Hawk
+    "Strix varia",              # Barred Owl
+    "Cyanocitta cristata",      # Blue Jay
+}
+
+def is_plausible_connecticut_bird(row):
+    model = (row["model_name"] or "").strip().casefold()
+    category = (row["category"] or "").strip().casefold()
+    scientific_name = (row["scientific_name"] or "").strip()
+    return (
+        "birdnet" in model
+        and category == "bird"
+        and scientific_name in CONNECTICUT_BIRD_SCIENTIFIC_NAMES
+    )
+
+
 def build_payload():
     if not DATABASE_PATH.exists():
         raise SystemExit(
@@ -48,7 +107,9 @@ def build_payload():
     species_scientific = {}
     hours, days, models, categories = Counter(), Counter(), Counter(), Counter()
     confidences = []
-    for row in detections:
+    accepted_detections = [row for row in detections if is_plausible_connecticut_bird(row)]
+    filtered_out_detections = len(detections) - len(accepted_detections)
+    for row in accepted_detections:
         label = (row["species"] or "Unknown").strip() or "Unknown"
         species_counts[label] += 1
         if row["scientific_name"]:
@@ -75,8 +136,9 @@ def build_payload():
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "summary": {
             "recordings": len(recordings),
-            "detections": len(detections),
+            "detections": len(accepted_detections),
             "candidate_labels": len(species_counts),
+            "filtered_out_detections": filtered_out_detections,
             "average_confidence": sum(confidences) / len(confidences) if confidences else None,
             "total_recording_hours": duration / 3600,
             "shannon_diversity": shannon,
