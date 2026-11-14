@@ -1,4 +1,5 @@
 """Build the public Listening Box PDF from the exact dashboard JSON used by Pages."""
+# This file is also the trigger for the automated report build workflow.
 import json
 from pathlib import Path
 from reportlab.lib import colors
