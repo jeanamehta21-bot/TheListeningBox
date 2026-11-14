@@ -2,19 +2,49 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#123b39"><meta name="description" content="The Listening Box acoustic biodiversity research dashboard.">
-<title>The Listening Box | Research Dashboard</title><link rel="stylesheet" href="./style.css">
+<meta name="theme-color" content="#101b20"><meta name="description" content="The Listening Box acoustic biodiversity research dashboard.">
+<title>The Listening Box | Field Dashboard</title><link rel="stylesheet" href="./style.css">
 </head>
-<body><main class="shell">
-<header class="topbar"><a class="brand" href="./"><span class="mark">◖</span><span><strong>THE LISTENING BOX</strong><small>Acoustic biodiversity research</small></span></a><span class="status"><i></i> Public research dashboard</span></header>
-<section class="hero"><div><p class="eyebrow">BIOACOUSTIC FIELD RESEARCH</p><h1>Listen closer.<br>Understand more.</h1><p class="intro">Explore summarized candidate detections and acoustic activity collected by The Listening Box.</p><p class="updated" id="updated">Loading dataset…</p></div>
-<aside class="report-card"><span class="eyebrow">RESEARCH REPORT</span><h2>Acoustic Biodiversity Analysis</h2><p>Printable summary of the dataset, candidate labels, activity patterns and methodological limitations.</p><a class="button" href="./reports/listening-box-report-v2.pdf">View PDF report</a></aside></section>
-<nav class="nav"><a href="#overview">Overview</a><a href="#species">Candidate labels</a><a href="#activity">Activity</a><a href="#methods">Methods & limitations</a></nav>
-<section id="overview"><div class="section-head"><div><h2>Dataset overview</h2><p>Aggregate results from the local Listening Box database</p></div></div>
-<div class="metrics"><article class="metric"><span>Recordings</span><strong id="recordings">—</strong></article><article class="metric"><span>Candidate detections</span><strong id="detections">—</strong></article><article class="metric"><span>Connecticut bird labels</span><strong id="labels">—</strong></article><article class="metric"><span>Mean confidence</span><strong id="confidence">—</strong></article></div>
-<div class="metrics secondary"><article class="metric"><span>Recording duration</span><strong id="duration">—</strong></article><article class="metric"><span>Shannon index*</span><strong id="shannon">—</strong></article><article class="metric"><span>Simpson index*</span><strong id="simpson">—</strong></article><article class="metric"><span>Excluded model outputs</span><strong id="filtered-out">—</strong></article></div><p class="footnote">*Calculated from candidate-label detection frequencies. These are descriptive indices, not verified ecological census estimates.</p></section>
-<section id="species"><div class="section-head"><div><h2>Connecticut bird candidates</h2><p>Filtered BirdNET predictions for species on the site's Connecticut allowlist; these are still unverified candidates.</p></div></div><div class="panel"><input id="species-search" class="search" type="search" placeholder="Search candidate labels…" aria-label="Search candidate labels"><div id="species-list" class="species-list"><p class="muted">Loading…</p></div></div></section>
-<section id="activity"><div class="section-head"><div><h2>Activity patterns</h2><p>Distribution of saved detections by recording timestamp</p></div></div><div class="two-col"><article class="panel"><h3>Detections by hour</h3><div id="hourly-chart" class="bar-chart"></div></article><article class="panel"><h3>Recent daily activity</h3><div id="daily-chart" class="daily-chart"></div></article></div></section>
-<section id="methods"><div class="section-head"><div><h2>Methods & limitations</h2><p>How to interpret these results responsibly</p></div></div><div class="panel"><ul id="notes"><li>Loading interpretation notes…</li></ul><p class="privacy-note">This public dashboard contains aggregate summaries only. It does not host original audio files, local recording paths, the raw database, or exact station coordinates.</p></div></section>
-<footer>THE LISTENING BOX · Acoustic biodiversity research · <span id="footer-date"></span></footer>
-</main><script src="./app.js" defer></script></body></html>
+<body>
+<div class="app-shell">
+<aside class="sidebar">
+ <a class="brand" href="./"><span class="brand-mark">◖</span><span><strong>THE LISTENING BOX</strong><small>FIELD RESEARCH</small></span></a>
+ <div class="side-label">WORKSPACE</div>
+ <nav class="side-nav"><a class="active" href="#overview"><span>▦</span> Overview</a><a href="#species"><span>♧</span> Species</a><a href="#activity"><span>⌁</span> Activity</a><a href="#methods"><span>◎</span> Methodology</a></nav>
+ <div class="side-bottom"><div class="station-mark">◉</div><div><strong>Acoustic station</strong><small>Public research view</small></div></div>
+</aside>
+<main class="main-content">
+<header class="page-top"><div><div class="breadcrumb">FIELD RESEARCH <span>/</span> OVERVIEW</div><h1>Field overview</h1></div><div class="top-actions"><span class="status"><i></i> Dataset dashboard</span><a class="report-link" href="./reports/listening-box-report-v2.pdf">↗ Research report</a></div></header>
+<section class="welcome">
+ <div class="welcome-copy"><p class="eyebrow">THE LISTENING BOX · BIOACOUSTICS</p><h2>Listen closer.<br><em>Understand more.</em></h2><p>Explore the sounds of local biodiversity through acoustic recordings and machine-learning candidate identifications.</p><div class="data-stamp"><span class="pulse"></span><span id="updated">Loading dataset…</span></div></div>
+ <div class="welcome-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="sound-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="art-caption">SOUNDscape<br>OBSERVATION</span></div>
+</section>
+<section id="overview" class="section-block">
+ <div class="section-heading"><div><p class="eyebrow">YOUR DATA, AT A GLANCE</p><h2>Research snapshot</h2></div><span class="section-note">Aggregated dataset metrics</span></div>
+ <div class="metric-grid">
+  <article class="metric-card"><div class="metric-top"><span>Recordings</span><span class="metric-icon">◉</span></div><strong id="recordings">—</strong><small>Audio files analyzed</small></article>
+  <article class="metric-card"><div class="metric-top"><span>Candidate detections</span><span class="metric-icon">⌁</span></div><strong id="detections">—</strong><small>Model predictions retained</small></article>
+  <article class="metric-card"><div class="metric-top"><span>Candidate labels</span><span class="metric-icon">♧</span></div><strong id="labels">—</strong><small>Connecticut bird allowlist</small></article>
+  <article class="metric-card"><div class="metric-top"><span>Recording time</span><span class="metric-icon">◷</span></div><strong id="duration">—</strong><small>Total audio duration</small></article>
+ </div>
+ <div class="insight-grid">
+  <article class="story-card"><div class="card-heading"><span class="eyebrow">FIELD NOTE</span><span class="tag">DATA SUMMARY</span></div><h3>What the dataset tells us</h3><p>The current dataset contains candidate bird identifications from recorded audio. The species ranking below shows which labels appeared most often in the retained model outputs.</p><p class="caution">A model detection is a lead for investigation — not a confirmed sighting. Listening and expert review are needed before drawing ecological conclusions.</p></article>
+  <article class="quality-card"><div class="card-heading"><span class="eyebrow">MODEL FILTERING</span><span class="quality-dot"></span></div><div class="quality-number" id="filtered-out">—</div><h3>Outputs excluded</h3><p>Non-bird and out-of-region classifier labels are kept out of the public candidate list.</p><div class="quality-divider"></div><div class="quality-row"><span>Mean confidence</span><strong id="confidence">—</strong></div><div class="quality-row"><span>Shannon index*</span><strong id="shannon">—</strong></div><div class="quality-row"><span>Simpson index*</span><strong id="simpson">—</strong></div><small class="quality-footnote">*Descriptive indices calculated from candidate-label frequencies, not verified biodiversity estimates.</small></article>
+ </div>
+</section>
+<section id="species" class="section-block">
+ <div class="section-heading"><div><p class="eyebrow">SPECIES EXPLORER</p><h2>Candidate species</h2><p class="section-description">BirdNET predictions matched to the Connecticut bird allowlist.</p></div><input id="species-search" class="search" type="search" placeholder="Search species…" aria-label="Search candidate labels"></div>
+ <div class="content-card"><div class="list-head"><span>SPECIES / SCIENTIFIC NAME</span><span>DETECTIONS</span></div><div id="species-list" class="species-list"><p class="muted">Loading candidate labels…</p></div></div>
+</section>
+<section id="activity" class="section-block">
+ <div class="section-heading"><div><p class="eyebrow">TEMPORAL ANALYSIS</p><h2>Acoustic activity</h2><p class="section-description">Explore when candidate detections appear in the saved dataset.</p></div></div>
+ <div class="chart-grid"><article class="content-card chart-card"><div class="card-heading"><div><h3>Activity by hour</h3><p>Distribution across the 24-hour day</p></div><span class="chart-mark">24H</span></div><div id="hourly-chart" class="bar-chart"></div></article><article class="content-card chart-card"><div class="card-heading"><div><h3>Daily detections</h3><p>Recent recording dates</p></div><span class="chart-mark">DAILY</span></div><div id="daily-chart" class="daily-chart"></div></article></div>
+</section>
+<section id="methods" class="section-block">
+ <div class="section-heading"><div><p class="eyebrow">TRANSPARENCY FIRST</p><h2>Methods & limitations</h2></div></div>
+ <div class="content-card methods-card"><div class="method-icon">◎</div><div><h3>Interpret the evidence carefully</h3><ul id="notes"><li>Loading interpretation notes…</li></ul><p class="privacy-note">This public dashboard displays aggregate summaries only. Original audio, local file paths, the raw database, and exact station coordinates are not published here.</p></div></div>
+</section>
+<footer><span>THE LISTENING BOX</span><span>Acoustic biodiversity research · <span id="footer-date"></span></span></footer>
+</main></div>
+<script src="./app.js" defer></script>
+</body></html>
