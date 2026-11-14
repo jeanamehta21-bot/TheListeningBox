@@ -1,70 +1,15 @@
 const DATA_URL="./data/dashboard.json";
-const el=id=>document.getElementById(id);
-const fmt=n=>new Intl.NumberFormat().format(n??0);
-const set=(id,value)=>{el(id).textContent=value;};
-function emptyChart(host,message){const p=document.createElement("p");p.className="chart-empty";p.textContent=message;host.append(p);}
-function renderSpecies(items){
- const host=el("species-list"),q=el("species-search").value.trim().toLowerCase();
- const found=items.filter(x=>(x.label||"").toLowerCase().includes(q)||(x.scientific_name||"").toLowerCase().includes(q));
- const max=Math.max(1,...items.map(x=>x.detections));host.innerHTML="";
- if(!found.length){host.textContent="No candidate labels match this search.";return;}
- found.slice(0,30).forEach(x=>{
-  const row=document.createElement("div");row.className="species-item";
-  const name=document.createElement("strong");name.textContent=x.label;
-  const count=document.createElement("span");count.textContent=fmt(x.detections);
-  const sci=document.createElement("small");sci.textContent=x.scientific_name||"Scientific name not supplied";
-  const track=document.createElement("div");track.className="track";
-  const fill=document.createElement("span");fill.style.width=(100*x.detections/max)+"%";
-  track.append(fill);row.append(name,count,sci,track);host.append(row);
- });
-}
-function renderHourly(items){
- const host=el("hourly-chart");host.innerHTML="";
- if(!items.length||items.every(x=>Number(x.detections||0)===0)){emptyChart(host,"Hourly timestamps are not available in the current export. No hourly pattern is shown.");return;}
- const max=Math.max(1,...items.map(x=>x.detections));
- items.forEach(x=>{
-  const col=document.createElement("div");col.className="hour";
-  const count=document.createElement("b");count.textContent=x.detections?fmt(x.detections):"";
-  const bar=document.createElement("i");bar.style.height=Math.max(2,125*x.detections/max)+"px";
-  bar.title=String(x.hour).padStart(2,"0")+":00 — "+x.detections+" detections";
-  const label=document.createElement("small");label.textContent=String(x.hour).padStart(2,"0");
-  col.append(count,bar,label);host.append(col);
- });
-}
-function renderDaily(items,totalDetections){
- const host=el("daily-chart"),recent=items.slice(-14);host.innerHTML="";
- if(!recent.length){emptyChart(host,"No dated detections are available yet.");return;}
- const dailyTotal=recent.reduce((sum,x)=>sum+Number(x.detections||0),0);
- recent.forEach(x=>{
-  const row=document.createElement("div");row.className="daily-row";
-  const date=document.createElement("span");date.textContent=x.date;
-  const track=document.createElement("div");track.className="track";
-  const fill=document.createElement("span");fill.style.width=(100*x.detections/Math.max(1,...recent.map(y=>y.detections)))+"%";track.append(fill);
-  const count=document.createElement("em");count.textContent=fmt(x.detections);
-  row.append(date,track,count);host.append(row);
- });
- if(Number.isFinite(Number(totalDetections))&&dailyTotal>Number(totalDetections)){
-  const warning=document.createElement("p");warning.className="data-warning";warning.textContent="Data check: the daily totals in this export exceed the overall candidate-detection total. Treat this chart as provisional until the export is reconciled.";host.append(warning);
- }
-}
-async function load(){
- try{
-  const response=await fetch(DATA_URL,{cache:"no-store"});if(!response.ok)throw new Error("HTTP "+response.status);
-  const data=await response.json(),s=data.summary||{};
-  set("recordings",fmt(s.recordings));set("detections",fmt(s.detections));set("labels",fmt(s.candidate_labels));set("filtered-out",fmt(s.filtered_out_detections));
-  set("confidence",s.average_confidence==null?"—":(100*s.average_confidence).toFixed(1)+"%");
-  set("duration",(Number(s.total_recording_hours||0)).toFixed(2)+" h");
-  set("shannon",s.shannon_diversity==null?"—":Number(s.shannon_diversity).toFixed(3));
-  set("simpson",s.simpson_diversity==null?"—":Number(s.simpson_diversity).toFixed(3));
-  set("updated","Data export: "+(data.generated_at||"date unavailable"));set("footer-date",new Date().getFullYear());
-  renderSpecies(data.species||[]);renderHourly(data.hourly||[]);renderDaily(data.daily||[],s.detections);
-  const notes=el("notes");notes.innerHTML="";
-  (data.interpretation_notes||[]).forEach(note=>{const li=document.createElement("li");li.textContent=note;notes.append(li);});
-  el("species-search").addEventListener("input",()=>renderSpecies(data.species||[]));
- }catch(err){
-  set("updated","Dashboard data unavailable: "+err.message);
-  el("species-list").textContent="Dashboard data could not be loaded. Check the published data export.";
-  el("hourly-chart").textContent="No data loaded.";el("daily-chart").textContent="No data loaded.";
- }
-}
+const el=id=>document.getElementById(id), fmt=n=>new Intl.NumberFormat().format(n??0);
+let dataset=null, charts=[];
+function text(id,value){const node=el(id);if(node)node.textContent=value;}
+function empty(node,message){node.textContent=message;node.classList.add("empty-state");}
+function speciesRows(items,query="",limit=30){const host=el("species-list");if(!host)return;host.innerHTML="";const q=query.trim().toLowerCase();const list=items.filter(x=>(x.label||"").toLowerCase().includes(q)||(x.scientific_name||"").toLowerCase().includes(q));if(!list.length){empty(host,"No candidate species match this search.");return;}const max=Math.max(1,...items.map(x=>Number(x.detections)||0));list.slice(0,limit).forEach(x=>{const row=document.createElement("div");row.className="species-item";const name=document.createElement("strong");name.textContent=x.label;const count=document.createElement("span");count.textContent=fmt(x.detections);const sci=document.createElement("small");sci.textContent=x.scientific_name||"Scientific name unavailable";const track=document.createElement("div");track.className="track";const fill=document.createElement("span");fill.style.width=(100*(Number(x.detections)||0)/max)+"%";track.append(fill);row.append(name,count,sci,track);host.append(row);});}
+function birdCards(items,query=""){const host=el("bird-grid");if(!host)return;host.innerHTML="";const q=query.toLowerCase();items.filter(x=>(x.label+" "+(x.scientific_name||"")).toLowerCase().includes(q)).forEach(x=>{const card=document.createElement("article");card.className="bird-card";const title=document.createElement("h3");title.textContent=x.label;const sci=document.createElement("em");sci.textContent=x.scientific_name||"";const count=document.createElement("strong");count.textContent=fmt(x.detections)+" candidate detections";const note=document.createElement("p");note.textContent="Automated candidate label · not independently confirmed";card.append(title,sci,count,note);host.append(card);});if(!host.children.length)empty(host,"No species match this search.");}
+function chart(id,type,labels,values,label){if(!window.Chart)return;const canvas=el(id);if(!canvas)return;const instance=new Chart(canvas,{type,data:{labels,datasets:[{label,data:values,backgroundColor:type==="bar"?"rgba(112,198,173,.72)":"rgba(112,198,173,.16)",borderColor:"#70c6ad",borderWidth:2,borderRadius:5,tension:.32,fill:type==="line",pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:"#a9bfba",boxWidth:10,font:{size:10}}}},scales:{x:{ticks:{color:"#91a5a4",font:{size:9}},grid:{color:"rgba(145,165,164,.08)"}},y:{beginAtZero:true,ticks:{color:"#91a5a4",precision:0,font:{size:9}},grid:{color:"rgba(145,165,164,.08)"}}}}});charts.push(instance);}
+function loadData(d){dataset=d;const s=d.summary||{},items=d.species||[];text("recordings",fmt(s.recordings));text("detections",fmt(s.detections));text("labels",fmt(s.candidate_labels));text("filtered-out",fmt(s.filtered_out_detections));text("duration",(Number(s.total_recording_hours||0)).toFixed(2)+" h");text("confidence",s.average_confidence==null?"Not supplied":(100*s.average_confidence).toFixed(1)+"%");text("shannon",s.shannon_diversity==null?"—":Number(s.shannon_diversity).toFixed(3));text("simpson",s.simpson_diversity==null?"—":Number(s.simpson_diversity).toFixed(3));text("updated","Dataset exported "+(d.generated_at||"at an unknown time"));text("story-title","The dataset contains "+fmt(s.candidate_labels)+" candidate bird labels");text("story-text",fmt(s.detections)+" model detections are represented across "+fmt(s.recordings)+" recordings. The export does not include today's individual visits, so it cannot identify a latest bird or unusual activity.");text("insight-title","A diverse set of candidate labels");text("insight-copy","The current export contains "+fmt(s.candidate_labels)+" candidate labels and "+fmt(s.detections)+" candidate detections. Shannon diversity is "+(s.shannon_diversity==null?"not available":Number(s.shannon_diversity).toFixed(2))+" for these model outputs. This describes the distribution of predictions, not confirmed species diversity.");speciesRows(items);birdCards(items);const notes=el("notes");(d.interpretation_notes||[]).forEach(n=>{const li=document.createElement("li");li.textContent=n;notes.append(li);});chart("top-chart","bar",items.slice(0,10).map(x=>x.label),items.slice(0,10).map(x=>x.detections),"Candidate detections");chart("trend-chart","line",(d.daily||[]).map(x=>x.date),(d.daily||[]).map(x=>x.detections),"Daily candidates");}
+async function load(){try{const r=await fetch(DATA_URL,{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);loadData(await r.json());}catch(e){text("updated","Dashboard data unavailable: "+e.message);const list=el("species-list");if(list)empty(list,"Could not load the published data export.");}}
+document.querySelectorAll(".side-nav a").forEach(a=>a.addEventListener("click",()=>{document.querySelectorAll(".side-nav a").forEach(x=>x.classList.toggle("active",x===a));const id=a.getAttribute("href").slice(1);text("page-title",a.textContent.trim());document.querySelectorAll(".view-section").forEach(v=>v.classList.toggle("hidden",v.id!==id));}));
+el("species-search")?.addEventListener("input",e=>speciesRows(dataset?.species||[],e.target.value));
+el("bird-search")?.addEventListener("input",e=>birdCards(dataset?.species||[],e.target.value));
+el("timeline-date")?.addEventListener("change",e=>{const host=el("timeline-content");host.innerHTML="";const date=(dataset?.daily||[]).find(x=>x.date===e.target.value);const p=document.createElement("p");p.textContent=date?"The export records "+date.detections+" detections on this date, but it does not contain individual visits, species-by-hour lanes, or playable clips.":"No aggregate detections are listed for this date. Individual visit records are not available.";host.append(p);});
 load();
